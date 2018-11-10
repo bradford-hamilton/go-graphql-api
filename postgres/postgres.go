@@ -44,7 +44,7 @@ type RestQueryRes struct {
 
 // RestQuery is the db query we use for our rest endpoint
 func (d *Db) RestQuery() *RestQueryRes {
-	rows, err := d.Query("SELECT * FROM user LIMIT 1")
+	rows, err := d.Query("SELECT * FROM users LIMIT 1")
 	if err != nil {
 		fmt.Println("RestQuery Err: ", err)
 	}
@@ -71,7 +71,7 @@ type GetUserByNameRes struct {
 
 // GetUserByName is the db query we use for our graphql endpoint
 func (d *Db) GetUserByName(name string) *GetUserByNameRes {
-	stmt, err := d.Prepare("SELECT * FROM user WHERE name=$1")
+	stmt, err := d.Prepare("SELECT * FROM users WHERE name=$1")
 	if err != nil {
 		fmt.Println("GetUserByName Preperation Err: ", err)
 	}
