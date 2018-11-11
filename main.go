@@ -15,15 +15,20 @@ import (
 )
 
 func main() {
+	// Initialize our api and return a pointer to our router for http.ListenAndServe
+	// and a pointer to our db to defer its closing when main() is finished
 	router, db := initializeAPI()
 	defer db.Close()
 
+	// Listen on port 4000 and if there's an error log it and exit
 	log.Fatal(http.ListenAndServe(":4000", router))
 }
 
 func initializeAPI() (*chi.Mux, *postgres.Db) {
+	// Create a new router
 	router := chi.NewRouter()
 
+	// Create a new connection to our pg database
 	db, err := postgres.New(
 		postgres.ConnString("localhost", 5432, "bradford", "go_test_db"),
 	)
@@ -31,7 +36,9 @@ func initializeAPI() (*chi.Mux, *postgres.Db) {
 		log.Fatal(err)
 	}
 
+	// Create our root query for graphql
 	rootQuery := gql.NewRoot(db)
+	// Create a new graphql schema, passing in the the root query
 	sc, err := graphql.NewSchema(
 		graphql.SchemaConfig{Query: rootQuery.Query},
 	)
@@ -39,11 +46,14 @@ func initializeAPI() (*chi.Mux, *postgres.Db) {
 		fmt.Println("Error creating schema: ", err)
 	}
 
+	// Create a server struct that holds a pointer to our database as well
+	// as the address of our graphql schema
 	s := server.Server{
 		Db:        db,
 		GqlSchema: &sc,
 	}
 
+	// Add some middleware to our router
 	router.Use(
 		render.SetContentType(render.ContentTypeJSON), // set content-type headers as application/json
 		middleware.Logger,          // log api request calls
@@ -52,10 +62,10 @@ func initializeAPI() (*chi.Mux, *postgres.Db) {
 		middleware.Recoverer,       // recover from panics without crashing server
 	)
 
-	// GraphQL route
+	// Create the graphql route with a Server method to handle it
 	router.Post("/graphql", s.GraphQL())
 
-	// Restful routes
+	// Create a restful route with a Server method to handle it
 	router.Get("/restful/endpoint", s.RestfulEndpoint())
 
 	return router, db
