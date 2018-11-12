@@ -13,13 +13,15 @@ type Db struct {
 	*sql.DB
 }
 
-// New makes a new database using the connection string and returns it, otherwise returns the error
+// New makes a new database using the connection string and
+// returns it, otherwise returns the error
 func New(connString string) (*Db, error) {
 	db, err := sql.Open("postgres", connString)
 	if err != nil {
 		return nil, err
 	}
 
+	// Check that our connection is good
 	err = db.Ping()
 	if err != nil {
 		return nil, err
@@ -29,6 +31,7 @@ func New(connString string) (*Db, error) {
 }
 
 // ConnString returns a connection string based on the parameters it's given
+// This would normally also contain the password, however we're not using one
 func ConnString(host string, port int, user string, dbName string) string {
 	return fmt.Sprintf(
 		"host=%s port=%d user=%s dbname=%s sslmode=disable",
@@ -36,52 +39,24 @@ func ConnString(host string, port int, user string, dbName string) string {
 	)
 }
 
-// RestQueryRes is the response shape for our db's RestQuery() method
-type RestQueryRes struct {
-	ID      int
-	Address string
+// User shape
+type User struct {
+	ID         int
+	Name       string
+	Age        int
+	Profession string
+	Friendly   bool
 }
 
-// RestQuery is the db query we use for our rest endpoint
-func (d *Db) RestQuery() *RestQueryRes {
+// RestQuery is the db query we use for our rest endpoint.
+func (d *Db) RestQuery() *User {
+	// Simple useless query for a single user
 	rows, err := d.Query("SELECT * FROM users LIMIT 1")
 	if err != nil {
 		fmt.Println("RestQuery Err: ", err)
 	}
 
-	var r RestQueryRes
-	for rows.Next() {
-		err = rows.Scan(&r.ID, &r.Address)
-		if err != nil {
-			fmt.Println("rows.Next() Err: ", err)
-		}
-	}
-
-	return &r
-}
-
-// GetUserByNameRes is the response shape for our db's GetUserByName() method
-type GetUserByNameRes struct {
-	ID         int    `json:"id"`
-	Name       string `json:"name"`
-	Age        int    `json:"age"`
-	Profession string `json:"profession"`
-	Friendly   bool   `json:"friendly"`
-}
-
-// GetUserByName is the db query we use for our graphql endpoint
-func (d *Db) GetUserByName(name string) *GetUserByNameRes {
-	stmt, err := d.Prepare("SELECT * FROM users WHERE name=$1")
-	if err != nil {
-		fmt.Println("GetUserByName Preperation Err: ", err)
-	}
-
-	rows, err := stmt.Query(name)
-	if err != nil {
-		fmt.Println("GetUserByName Err: ", err)
-	}
-
-	var r GetUserByNameRes
+	var r User
 	for rows.Next() {
 		err = rows.Scan(
 			&r.ID,
@@ -91,7 +66,40 @@ func (d *Db) GetUserByName(name string) *GetUserByNameRes {
 			&r.Friendly,
 		)
 		if err != nil {
-			fmt.Println("rows.Next() Err: ", err)
+			fmt.Println("Error scanning rows: ", err)
+		}
+	}
+
+	return &r
+}
+
+// GetUserByName is called within our user query for graphql
+func (d *Db) GetUserByName(name string) *User {
+	// Prepare query, takes a name argument, protects from sql injection
+	stmt, err := d.Prepare("SELECT * FROM users WHERE name=$1")
+	if err != nil {
+		fmt.Println("GetUserByName Preperation Err: ", err)
+	}
+
+	// Make query with our stmt, passing in name argument
+	rows, err := stmt.Query(name)
+	if err != nil {
+		fmt.Println("GetUserByName Query Err: ", err)
+	}
+
+	// Create User struct for holding our response data
+	var r User
+	// Copy the columns from row into the values pointed at by r (User)
+	for rows.Next() {
+		err = rows.Scan(
+			&r.ID,
+			&r.Name,
+			&r.Age,
+			&r.Profession,
+			&r.Friendly,
+		)
+		if err != nil {
+			fmt.Println("Error scanning rows: ", err)
 		}
 	}
 
