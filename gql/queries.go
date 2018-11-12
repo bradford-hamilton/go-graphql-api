@@ -5,9 +5,8 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
-// Root encapsulates graphql's query type object and connection to Db
+// Root holds a pointer to a graphql object
 type Root struct {
-	db    *postgres.Db
 	Query *graphql.Object
 }
 
