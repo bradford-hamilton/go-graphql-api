@@ -2,7 +2,7 @@ package gql
 
 import "github.com/graphql-go/graphql"
 
-// User is a graphql object containing a User
+// User describes a graphql object containing a User
 var User = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "User",
