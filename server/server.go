@@ -5,14 +5,12 @@ import (
 	"net/http"
 
 	"github.com/bradford-hamilton/go-graphql-api/gql"
-	"github.com/bradford-hamilton/go-graphql-api/postgres"
 	"github.com/go-chi/render"
 	"github.com/graphql-go/graphql"
 )
 
 // Server will hold connection to the db as well as handlers
 type Server struct {
-	Db        *postgres.Db
 	GqlSchema *graphql.Schema
 }
 
@@ -43,25 +41,5 @@ func (s *Server) GraphQL() http.HandlerFunc {
 		// marshalling to json, automatically escaping HTML and setting
 		// the Content-Type as application/json.
 		render.JSON(w, r, result)
-	}
-}
-
-// RestfulEndpoint returns an http.HandlerFunc for our /restful/endpoint endpoint
-func (s *Server) RestfulEndpoint() http.HandlerFunc {
-	type response struct {
-		ID         int    `json:"id"`
-		Name       string `json:"name"`
-		Age        int    `json:"age"`
-		Profession string `json:"profession"`
-		Friendly   bool   `json:"friendly"`
-	}
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		res := s.Db.RestQuery()
-
-		// render.JSON comes from the chi/render package and handles
-		// marshalling to json, automatically escaping HTML and setting
-		// the Content-Type as application/json.
-		render.JSON(w, r, res)
 	}
 }

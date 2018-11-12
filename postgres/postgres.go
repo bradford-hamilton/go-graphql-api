@@ -48,33 +48,6 @@ type User struct {
 	Friendly   bool
 }
 
-// RestQuery is the db query we use for our rest endpoint.
-func (d *Db) RestQuery() *User {
-	// Simple useless query for a single user
-	rows, err := d.Query("SELECT * FROM users LIMIT 1")
-	if err != nil {
-		fmt.Println("RestQuery Err: ", err)
-	}
-
-	// Create User struct for holding our response data
-	var r User
-	// Copy the columns from row into the values pointed at by r (User)
-	for rows.Next() {
-		err = rows.Scan(
-			&r.ID,
-			&r.Name,
-			&r.Age,
-			&r.Profession,
-			&r.Friendly,
-		)
-		if err != nil {
-			fmt.Println("Error scanning rows: ", err)
-		}
-	}
-
-	return &r
-}
-
 // GetUsersByName is called within our user query for graphql
 func (d *Db) GetUsersByName(name string) []User {
 	// Prepare query, takes a name argument, protects from sql injection

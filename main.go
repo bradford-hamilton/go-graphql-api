@@ -49,7 +49,6 @@ func initializeAPI() (*chi.Mux, *postgres.Db) {
 	// Create a server struct that holds a pointer to our database as well
 	// as the address of our graphql schema
 	s := server.Server{
-		Db:        db,
 		GqlSchema: &sc,
 	}
 
@@ -64,9 +63,6 @@ func initializeAPI() (*chi.Mux, *postgres.Db) {
 
 	// Create the graphql route with a Server method to handle it
 	router.Post("/graphql", s.GraphQL())
-
-	// Create a restful route with a Server method to handle it
-	router.Get("/restful/endpoint", s.RestfulEndpoint())
 
 	return router, db
 }
