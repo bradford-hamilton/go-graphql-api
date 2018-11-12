@@ -56,7 +56,9 @@ func (d *Db) RestQuery() *User {
 		fmt.Println("RestQuery Err: ", err)
 	}
 
+	// Create User struct for holding our response data
 	var r User
+	// Copy the columns from row into the values pointed at by r (User)
 	for rows.Next() {
 		err = rows.Scan(
 			&r.ID,
