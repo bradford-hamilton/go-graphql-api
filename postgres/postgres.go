@@ -76,7 +76,7 @@ func (d *Db) RestQuery() *User {
 }
 
 // GetUserByName is called within our user query for graphql
-func (d *Db) GetUserByName(name string) *User {
+func (d *Db) GetUserByName(name string) (*User, bool) {
 	// Prepare query, takes a name argument, protects from sql injection
 	stmt, err := d.Prepare("SELECT * FROM users WHERE name=$1")
 	if err != nil {
@@ -89,10 +89,13 @@ func (d *Db) GetUserByName(name string) *User {
 		fmt.Println("GetUserByName Query Err: ", err)
 	}
 
+	rowsFound := false
 	// Create User struct for holding our response data
 	var r User
 	// Copy the columns from row into the values pointed at by r (User)
 	for rows.Next() {
+		// Check that at least one row was found
+		rowsFound = true
 		err = rows.Scan(
 			&r.ID,
 			&r.Name,
@@ -105,5 +108,5 @@ func (d *Db) GetUserByName(name string) *User {
 		}
 	}
 
-	return &r
+	return &r, rowsFound
 }

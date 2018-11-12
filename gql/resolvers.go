@@ -15,7 +15,11 @@ func (r *Resolver) UserResolver(p graphql.ResolveParams) (interface{}, error) {
 	// Strip the name from arguments and assert that it's a string
 	name, ok := p.Args["name"].(string)
 	if ok {
-		user := r.db.GetUserByName(name)
+		user, rowsFound := r.db.GetUserByName(name)
+		// If no rows were found return nil
+		if !rowsFound {
+			return nil, nil
+		}
 		return user, nil
 	}
 
