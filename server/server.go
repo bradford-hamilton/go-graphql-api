@@ -38,6 +38,10 @@ func (s *Server) GraphQL() http.HandlerFunc {
 
 		// Execute graphql query
 		result := gql.ExecuteQuery(rBody.Query, *s.GqlSchema)
+
+		// render.JSON comes from the chi/render package and handles
+		// marshalling to json, automatically escaping HTML and setting
+		// the Content-Type as application/json.
 		render.JSON(w, r, result)
 	}
 }
@@ -54,6 +58,10 @@ func (s *Server) RestfulEndpoint() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		res := s.Db.RestQuery()
+
+		// render.JSON comes from the chi/render package and handles
+		// marshalling to json, automatically escaping HTML and setting
+		// the Content-Type as application/json.
 		render.JSON(w, r, res)
 	}
 }
