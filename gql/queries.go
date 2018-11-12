@@ -22,9 +22,9 @@ func NewRoot(db *postgres.Db) *Root {
 			graphql.ObjectConfig{
 				Name: "Query",
 				Fields: graphql.Fields{
-					"user": &graphql.Field{
-						// User type which can be found in types.go
-						Type: User,
+					"users": &graphql.Field{
+						// Slice of User type which can be found in types.go
+						Type: graphql.NewList(User),
 						Args: graphql.FieldConfigArgument{
 							"name": &graphql.ArgumentConfig{
 								Type: graphql.String,
