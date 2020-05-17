@@ -1,5 +1,5 @@
 # STEP 1: Build executable binary
-FROM golang:1.9 AS builder
+FROM golang:1.14 AS builder
 # Copy project into image
 COPY . $GOPATH/src/github.com/bradford-hamilton/go-graphql-api
 # Set working directory to /go-graphql-api which contains main.go

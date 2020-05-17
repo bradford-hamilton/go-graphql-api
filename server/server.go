@@ -28,6 +28,7 @@ func (s *Server) GraphQL() http.HandlerFunc {
 		}
 
 		var rBody reqBody
+
 		// Decode the request body into rBody
 		err := json.NewDecoder(r.Body).Decode(&rBody)
 		if err != nil {

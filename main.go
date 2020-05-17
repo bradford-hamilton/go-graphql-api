@@ -38,6 +38,7 @@ func initializeAPI() (*chi.Mux, *postgres.Db) {
 
 	// Create our root query for graphql
 	rootQuery := gql.NewRoot(db)
+
 	// Create a new graphql schema, passing in the the root query
 	sc, err := graphql.NewSchema(
 		graphql.SchemaConfig{Query: rootQuery.Query},
@@ -48,9 +49,7 @@ func initializeAPI() (*chi.Mux, *postgres.Db) {
 
 	// Create a server struct that holds a pointer to our database as well
 	// as the address of our graphql schema
-	s := server.Server{
-		GqlSchema: &sc,
-	}
+	s := server.Server{GqlSchema: &sc}
 
 	// Add some middleware to our router
 	router.Use(

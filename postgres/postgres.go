@@ -22,8 +22,7 @@ func New(connString string) (*Db, error) {
 	}
 
 	// Check that our connection is good
-	err = db.Ping()
-	if err != nil {
+	if err := db.Ping(); err != nil {
 		return nil, err
 	}
 
@@ -68,14 +67,13 @@ func (d *Db) GetUsersByName(name string) []User {
 	users := []User{}
 	// Copy the columns from row into the values pointed at by r (User)
 	for rows.Next() {
-		err = rows.Scan(
+		if err := rows.Scan(
 			&r.ID,
 			&r.Name,
 			&r.Age,
 			&r.Profession,
 			&r.Friendly,
-		)
-		if err != nil {
+		); err != nil {
 			fmt.Println("Error scanning rows: ", err)
 		}
 		users = append(users, r)
