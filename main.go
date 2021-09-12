@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"compress/flate"
+
 
 	"github.com/bradford-hamilton/go-graphql-api/gql"
 	"github.com/bradford-hamilton/go-graphql-api/postgres"
@@ -55,7 +57,7 @@ func initializeAPI() (*chi.Mux, *postgres.Db) {
 	router.Use(
 		render.SetContentType(render.ContentTypeJSON), // set content-type headers as application/json
 		middleware.Logger,          // log api request calls
-		middleware.DefaultCompress, // compress results, mostly gzipping assets and json
+		middleware.Compress(flate.DefaultCompression), // compress results, mostly gzipping assets and json
 		middleware.StripSlashes,    // match paths with a trailing slash, strip it, and continue routing through the mux
 		middleware.Recoverer,       // recover from panics without crashing server
 	)
